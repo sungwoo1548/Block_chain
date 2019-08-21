@@ -1,0 +1,21 @@
+<%layout('layout/layout')%>
+
+<div class="container">
+    <h1>Create Transaction</h1>
+
+    <form action="/blockchain/settings" method="post">
+
+        <div class="form-group">
+            <label for="difficulty">블록체인 난이도 설정(Difficulty)</label>
+            <input type="text" class="form-control" id="difficulty" name="difficulty" value="">
+        </div>
+
+        <div class="form-group">
+            <label for="miningReward">블록 생성보상(miningReward)</label>
+            <input type="text" class="form-control" id="miningReward" name="miningReward" value="">
+        </div>
+
+        <button type="submit" class="btn btn-primary">적용</button>
+
+    </form>
+</div>

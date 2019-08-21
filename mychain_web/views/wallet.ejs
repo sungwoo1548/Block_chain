@@ -1,0 +1,36 @@
+<%layout('layout/layout')%>
+
+<div class="container text-truncate" >
+    <h1>Wallet</h1>
+    <label>Address:</label>
+    <p><%=wallet%></p>
+    <label>Balance:</label>
+    <p><%=balance%></p>
+</div>
+
+<hr />
+<div class="container">
+    <h1>거래내역</h1>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Aomunt</th>
+                <th>Valid?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%txall.forEach(function(el,idx) { %>
+            <tr>
+                <td><%=idx%></td>
+                <td class="text-truncate" style="max-width: 150px;"><%=el.fromAddress%></td>
+                <td class="text-truncate" style="max-width: 150px;"><%=el.toAddress%></td>
+                <td class="text-truncate"><%=el.amount%></td>
+                <td><span>✓</span></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>

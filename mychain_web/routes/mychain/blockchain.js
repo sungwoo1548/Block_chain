@@ -1,8 +1,9 @@
 const Block = require('./block');
 const Transaction = require('./transaction');
+const fs = require('fs');
 
 // 블록체인 전체를 정의하는 class
-class Blockchain { 
+class Blockchain {
     constructor() {
         // 가장 중요한 정보인 chain을 가지고 있음, 맨처음 Block에 해당함
         // pendingTransactions -> Transaction pool에는 있지만, 아직 처리 되지 않은 Transaction(아직 Block화 되지 않음)
@@ -11,7 +12,25 @@ class Blockchain {
         this.difficulty = 2;
         this.miningReward = 100;
         this.pendingTransactions = [];
+        this.accounts = [];
     }
+
+    loadKeyStore() {
+        console.log('load keystore...')
+        if (fs.existsSync('./routes/mychain/keystore.json')) {
+
+            let rawdata = fs.readFileSync('./routes/mychain/keystore.json');
+            let accountList = JSON.parse(rawdata);
+
+            this.accounts = accountList;
+            console.log(this.accounts);
+        }
+    }
+
+    saveKeyStore() {
+        fs.writeFileSync('./routes/mychain/keystore.json', JSON.stringify(this.accounts));
+    }
+
 
     // 추가할 block의 prevHash는 Blockchain 객체가 가지고 있는 가장 최신 Block의 curHash로 대체
     // 추가할 Block의 curHash를 다시 계산
@@ -36,17 +55,17 @@ class Blockchain {
     // 1. Block 내부 Hash 값 검증
     // 2. Previous Block Hash 값 검증
     isChainValid() {
-        for(let i = 1; i < this.chain.length; i++) {
+        for (let i = 1; i < this.chain.length; i++) {
             const curBlock = this.chain[i];
             const prevBlock = this.chain[i - 1];
             // 1.
-            if(curBlock.curHash !== curBlock.calculateHash()) {
+            if (curBlock.curHash !== curBlock.calculateHash()) {
                 console.log('Err 1 : Chain [', i, ']');
                 return false;
             }
 
             // 2.
-            if(prevBlock.curHash !== curBlock.prevHash) {
+            if (prevBlock.curHash !== curBlock.prevHash) {
                 console.log('Err 2 : Chain [', i, ']');
                 return false;
             }
@@ -59,12 +78,12 @@ class Blockchain {
     // 3. pending transaction에 추가
     addTransactions(transaction) {
         // 1. 
-        if(!transaction.fromAddress || !transaction.toAddress) {
+        if (!transaction.fromAddress || !transaction.toAddress) {
             console.log('Warn : Invalid transaction address');
         }
-        
+
         // 2. 
-        if(!transaction.isValid()) {
+        if (!transaction.isValid()) {
             console.log('Warn : Invalid transaction');
             return false;
         }
@@ -102,13 +121,13 @@ class Blockchain {
     getBalance(address) {
         let balance = 0;
 
-        for(let block of this.chain) {
-            for(let tx of block.transactions) {
-                if(tx.fromAddress == address) {
+        for (let block of this.chain) {
+            for (let tx of block.transactions) {
+                if (tx.fromAddress == address) {
                     balance -= tx.amount;
                 }
 
-                if(tx.toAddress == address) {
+                if (tx.toAddress == address) {
                     balance += tx.amount;
                 }
             }
@@ -120,9 +139,9 @@ class Blockchain {
     getAllTransactionOfWallet(address) {
         const txs = [];
 
-        for(let block of this.chain) {
-            for(let tx of block.transactions) {
-                if(tx.fromAddress == address || tx.toAddress == address) {
+        for (let block of this.chain) {
+            for (let tx of block.transactions) {
+                if (tx.fromAddress == address || tx.toAddress == address) {
                     txs.push(tx);
                 }
             }

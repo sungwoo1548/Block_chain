@@ -1,0 +1,33 @@
+<%layout('layout/layout')%>
+
+<div class="container text-truncate" >
+    <h1>accounts</h1>
+    <label>Address:</label>
+    <label>Balance:</label>
+</div>
+
+<hr />
+<div class="container">
+    <h1>계좌 목록</h1>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Accounts</th>
+                <th>Balance</th>
+                <th>Valid?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%accounts.forEach(function(el,idx) { %>
+            <tr>
+                <td><%=idx%></td>
+                <td class="text-truncate" style="max-width: 150px;"><%=el.WalletAddress%></td>
+                <td class="text-truncate" style="max-width: 150px;"><%=el.balance%></td>
+                <td><span>✓</span></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <button class="btn btn-primary"><a href="/blockchain/createaccount">계정생성</a></button>
+</div>

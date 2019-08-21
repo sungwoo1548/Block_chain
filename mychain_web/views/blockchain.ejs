@@ -9,7 +9,7 @@
     <% blocks.forEach(function(el,idx) { %>
     <% let str_border = (selectedIdx != null && selectedIdx ==el.index)? 'border-primary' :'' ;%>
 
-    <div class="card <%=str_border%>" onclick="showBlock(<%=idx%>);">
+    <div class="card <%=str_border%>" onclick="showBlock('<%=idx%>');">
         <div class="card-header">
             <h4>block <%=el.index%></h4>
         </div>
@@ -53,8 +53,10 @@
                 <%txs.forEach(function(el,idx) { %>
                 <tr>
                     <td><%=idx%></td>
-                    <td class="text-truncate" style="max-width: 150px;"><%=el.fromAddress%></td>
-                    <td class="text-truncate" style="max-width: 150px;"><%=el.toAddress%></td>
+                    <td class="text-truncate" style="max-width: 150px;" onclick="showWallet('<%=el.fromAddress%>');">
+                        <%=el.fromAddress%></td>
+                    <td class="text-truncate" style="max-width: 150px;" onclick="showWallet('<%=el.toAddress%>');">
+                        <%=el.toAddress%></td>
                     <td class="text-truncate"><%=el.amount%></td>
                     <td><span>✓</span></td>
                 </tr>
@@ -68,6 +70,13 @@
         function showBlock(index) {
             console.log('idx : ', index);
             location.href = '/blockchain/block/' + index;
+        }
+        function showWallet(walletid) {
+            if(walletid == 'null'){
+                return;
+            }
+            console.log('select address : ', walletid);
+            location.href = '/blockchain/wallet/' + walletid;
         }
     </script>
 

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
+
 /************************* test3.js *************************/
 
 // pending Transaction을 처리하는 test file
@@ -22,11 +23,14 @@ const privKey1 = ec.keyFromPrivate(userKeyStr1);
 const privKey2 = ec.keyFromPrivate(userKeyStr2);
 
 // Private Key에서 Public Key로 변환한 것을 hex type으로 하고 지갑 생성
-const wallet1 = privKey1.getPublic('hex');
-const wallet2 = privKey2.getPublic('hex');
+// const wallet1 = privKey1.getPublic('hex');
+// const wallet2 = privKey2.getPublic('hex');
 
 const mychain = new Blockchain();
-
+mychain.loadKeyStore();
+console.log(mychain.accounts);
+const wallet1 = mychain.accounts[0].WalletAddress;
+const wallet2 = mychain.accounts[1].WalletAddress;
 // 전자서명을 하는 이유는 userKeyStr1에 대한 값이 아닌 경우는 수행하지 못하도록 함.
 // 전자서명을 하는 부분
 const tx1 = new Transaction(wallet1, wallet2, 100);
@@ -48,7 +52,7 @@ mychain.minePendingTransactions(wallet1);
 
 mychain.printAllBlockchain();
 
-console.log('wallet1 Balance : ', mychain.getBalance(wallet1));
+console.log('wallet1  Balance : ', mychain.getBalance(wallet1));
 console.log('wallet2 Balance : ', mychain.getBalance(wallet2));
 
 console.log(">> wallet1 txs");
@@ -86,7 +90,7 @@ router.get('/createtx', function (req, res, next) {
 router.post('/createtx', function (req, res, next) {
   const fromAddress = req.body.fromAddress;
   const toaddress = req.body.toAddress;
-  const amount = req.body.amount;
+  const amount = parseInt(req.body.amount);
 
   console.log('fromAddress : ', fromAddress);
   console.log('toAddress : ', toaddress);
@@ -133,5 +137,37 @@ router.post('/settings', function (req, res, next) {
 
 });
 
+router.get('/wallet/:walletid', function (req, res, next) {
+
+  const walletid = req.params.walletid;
+  // const walletid = wallet1;
+
+  res.render('wallet',
+    {
+      wallet: walletid,
+      balance: mychain.getBalance(walletid),
+      txall: mychain.getAllTransactionOfWallet(walletid),
+    });
+});
+router.get('/accountslist', function (req, res, next) {
+  mychain.accounts.forEach((el, idx) => {
+    mychain.accounts[idx].balance = mychain.getBalance(el.WalletAddress);
+  });
+  res.render('accountslist', { accounts: mychain.accounts });
+});
+
+router.get('/createaccount', function (req, res, next) {
+  const newKey = ec.genKeyPair();
+  const newAccount = {
+    "PrivKey": newKey.getPrivate('hex'),
+    "PublicKey": newKey.getPublic('hex'),
+    "WalletAddress": newKey.getPublic('hex')
+  }
+
+  mychain.accounts.push(newAccount);
+  mychain.saveKeyStore();
+  res.redirect('/blockchain/accountslist');
+
+});
 
 module.exports = router;
